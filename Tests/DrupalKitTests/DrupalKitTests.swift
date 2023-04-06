@@ -4,7 +4,8 @@ import MySQLNIO
 
 final class DrupalKitTests: XCTestCase {
     let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
-    let databasePassword = DrupalKitTests.commandOutput("/usr/local/bin/op", "read", "op://ess-infrastructure/mysql-root/password")
+    let databaseUser = DrupalKitTests.commandOutput("/usr/local/bin/op", "read", "op://ess-infrastructure/mysql-tillerman/username")
+    let databasePassword = DrupalKitTests.commandOutput("/usr/local/bin/op", "read", "op://ess-infrastructure/mysql-tillerman/password")
     var db: MySQLConnection! = nil
     
     static func commandOutput(_ cmd: String, _ args: String...) -> String {
@@ -31,7 +32,7 @@ final class DrupalKitTests: XCTestCase {
     override func setUp() async throws {
         let eventLoop = group.any()
         db = try await MySQLConnection.connect(to: SocketAddress(ipAddress: "127.0.0.1", port: 3306),
-                                               username: "root",
+                                               username: databaseUser,
                                                database: "ess_drupal",
                                                password: databasePassword,
                                                on: eventLoop).get()
