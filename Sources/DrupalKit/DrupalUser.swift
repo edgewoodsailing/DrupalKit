@@ -67,6 +67,7 @@ extension MySQLDatabase {
             try await query(sql,binds) { row in
                 user = DrupalUser(row: row)
             }.get()
+            await user?.loadPermissions(from: self)
         }
         catch {
             print(error)
@@ -90,17 +91,13 @@ extension MySQLDatabase {
     }
     
     public func login(name: String, password: String) async -> DrupalUser? {
-        var user = await getUser(sql: "SELECT uid, name, mail, status FROM ess_drupal.users WHERE status AND name = ? AND pass = ? LIMIT 1",
+        return await getUser(sql: "SELECT uid, name, mail, status FROM ess_drupal.users WHERE status AND name = ? AND pass = ? LIMIT 1",
                                  binds: [MySQLData(string: name), MySQLData(string: DrupalUser.md5(string: password))])
-        await user?.loadPermissions(from: self)
-        return user
     }
     
     public func login(email: String, password: String) async -> DrupalUser? {
-        var user = await getUser(sql: "SELECT uid, name, mail, status FROM ess_drupal.users WHERE status AND mail = ? AND pass = ? LIMIT 1",
+        return await getUser(sql: "SELECT uid, name, mail, status FROM ess_drupal.users WHERE status AND mail = ? AND pass = ? LIMIT 1",
                                  binds: [MySQLData(string: email), MySQLData(string: DrupalUser.md5(string: password))])
-        await user?.loadPermissions(from: self)
-        return user
     }
 
 }
