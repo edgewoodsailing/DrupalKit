@@ -9,7 +9,7 @@ import Foundation
 import MySQLNIO
 import Crypto
 
-public struct DrupalUser {
+public struct DrupalUser: Codable {
     public let uid: Int
     public let name: String
     public let email: String
