@@ -44,7 +44,7 @@ public struct DrupalUser {
     public mutating func loadPermissions(from db: MySQLDatabase) async {
         do {
             var newPermissions: Set<String> = []
-            try await db.query("SELECT p.perm FROM permission AS p JOIN users_roles AS ur USING (rid) WHERE ur.uid = ?", [MySQLData(int: uid)]) { row in
+            try await db.query("SELECT p.perm FROM ess_drupal.permission AS p JOIN ess_drupal.users_roles AS ur USING (rid) WHERE ur.uid = ?", [MySQLData(int: uid)]) { row in
                 if let perm = row.column("perm")?.string {
                     for p in perm.split(separator: ", ") {
                         newPermissions.insert(String(p))
@@ -75,29 +75,29 @@ extension MySQLDatabase {
     }
     
     public func findUser(name: String) async -> DrupalUser? {
-        return await getUser(sql: "SELECT uid, name, mail, status FROM users WHERE name = ? LIMIT 1",
+        return await getUser(sql: "SELECT uid, name, mail, status FROM ess_drupal.users WHERE name = ? LIMIT 1",
                              binds: [MySQLData(string: name)])
     }
     
     public func findUser(email: String) async -> DrupalUser? {
-        return await getUser(sql: "SELECT uid, name, mail, status FROM users WHERE mail = ? LIMIT 1",
+        return await getUser(sql: "SELECT uid, name, mail, status FROM ess_drupal.users WHERE mail = ? LIMIT 1",
                              binds: [MySQLData(string: email)])
     }
     
     public func findUser(uid: Int) async -> DrupalUser? {
-        return await getUser(sql: "SELECT uid, name, mail, status FROM users WHERE uid = ? LIMIT 1",
+        return await getUser(sql: "SELECT uid, name, mail, status FROM ess_drupal.users WHERE uid = ? LIMIT 1",
                              binds: [MySQLData(int: uid)])
     }
     
     public func login(name: String, password: String) async -> DrupalUser? {
-        var user = await getUser(sql: "SELECT uid, name, mail, status FROM users WHERE status AND name = ? AND pass = ? LIMIT 1",
+        var user = await getUser(sql: "SELECT uid, name, mail, status FROM ess_drupal.users WHERE status AND name = ? AND pass = ? LIMIT 1",
                                  binds: [MySQLData(string: name), MySQLData(string: DrupalUser.md5(string: password))])
         await user?.loadPermissions(from: self)
         return user
     }
     
     public func login(email: String, password: String) async -> DrupalUser? {
-        var user = await getUser(sql: "SELECT uid, name, mail, status FROM users WHERE status AND mail = ? AND pass = ? LIMIT 1",
+        var user = await getUser(sql: "SELECT uid, name, mail, status FROM ess_drupal.users WHERE status AND mail = ? AND pass = ? LIMIT 1",
                                  binds: [MySQLData(string: email), MySQLData(string: DrupalUser.md5(string: password))])
         await user?.loadPermissions(from: self)
         return user
