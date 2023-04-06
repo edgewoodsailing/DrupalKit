@@ -4,7 +4,7 @@ import MySQLNIO
 
 final class DrupalKitTests: XCTestCase {
     let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
-    let databasePassword = DrupalKitTests.commandOutput("/usr/local/bin/op", "read", "op://Personal/pl5wgp55jjef5akjhmk4ilzvam/password")
+    let databasePassword = DrupalKitTests.commandOutput("/usr/local/bin/op", "read", "op://ess-infrastructure/mysql-root-password/password")
     var db: MySQLConnection! = nil
     
     static func commandOutput(_ cmd: String, _ args: String...) -> String {
